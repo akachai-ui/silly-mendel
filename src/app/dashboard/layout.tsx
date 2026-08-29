@@ -1,11 +1,12 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { signout } from '@/app/login/actions';
-import { LogOut, Home, BarChart2, Wallet, CalendarDays, Users, Scissors, Settings } from 'lucide-react';
+import { LogOut, Home, BarChart2, Wallet, CalendarDays, Users, Scissors, Settings, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
 import { getDictionary } from '@/utils/i18n';
 import { DashboardNav } from './DashboardNav';
+import { isAdminEmail } from '@/utils/admin';
 
 export default async function DashboardLayout({
   children,
@@ -28,6 +29,7 @@ export default async function DashboardLayout({
     .single();
 
   const dict = await getDictionary();
+  const isAdmin = isAdminEmail(user.email);
 
   const MENU_ITEMS = [
     { name: dict.layout.overview, href: '/dashboard', icon: BarChart2 },
@@ -59,6 +61,17 @@ export default async function DashboardLayout({
         
         {/* Profile & Logout */}
         <div className="flex items-center space-x-1 sm:space-x-4">
+          {isAdmin && (
+            <Link 
+              href="/admin" 
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-amber-900 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-full transition-all shadow-sm active:scale-95 shrink-0" 
+              title="โหมดผู้ดูแลระบบ / Dev Overview"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+              <span>Dev Admin</span>
+            </Link>
+          )}
+
           <LanguageSwitcher />
           
           <Link href="/dashboard" className="flex items-center gap-1.5 p-2 sm:px-4 text-sm font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors ml-1" title={dict.layout.home}>
