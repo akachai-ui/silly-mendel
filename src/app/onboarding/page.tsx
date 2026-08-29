@@ -8,7 +8,8 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const { message } = await searchParams;
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   if (!user) redirect('/login')
 
   const { data: shop } = await supabase.from('shops').select('id').eq('owner_id', user.id).single()

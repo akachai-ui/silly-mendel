@@ -6,15 +6,33 @@ import { Loader2, CheckCircle2, CalendarClock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import ConfirmModal from '@/components/ConfirmModal'
 
-export default function TransactionForm({ staffList, servicesList, pendingAppointments = [], dict }: { staffList: any[], servicesList: any[], pendingAppointments?: any[], dict: any }) {
+export default function TransactionForm({ 
+  staffList, 
+  servicesList, 
+  pendingAppointments = [], 
+  dict,
+  preselect
+}: { 
+  staffList: any[], 
+  servicesList: any[], 
+  pendingAppointments?: any[], 
+  dict: any,
+  preselect?: { staffId?: string; serviceName?: string; customerName?: string; aptId?: string } | null
+}) {
+  // Pre-calculate initial amount if preselect service matches
+  const initialMatchedServices = preselect?.serviceName
+    ? servicesList.filter((s: any) => preselect.serviceName?.includes(s.name))
+    : []
+  const initialAmount = initialMatchedServices.reduce((sum: number, s: any) => sum + Number(s.price || 0), 0)
+
   const [isLoading, setIsLoading] = useState(false)
-  const [selectedStaffId, setSelectedStaffId] = useState<string>('')
-  const [amount, setAmount] = useState<string>('')
-  const [serviceName, setServiceName] = useState<string>('')
-  const [selectedServices, setSelectedServices] = useState<any[]>([])
+  const [selectedStaffId, setSelectedStaffId] = useState<string>(preselect?.staffId || '')
+  const [amount, setAmount] = useState<string>(initialAmount > 0 ? initialAmount.toString() : '')
+  const [serviceName, setServiceName] = useState<string>(preselect?.serviceName || '')
+  const [selectedServices, setSelectedServices] = useState<any[]>(initialMatchedServices)
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash')
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null)
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(preselect?.aptId || null)
   const router = useRouter()
 
   const handleSelectAppointment = (apt: any) => {

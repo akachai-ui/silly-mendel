@@ -130,120 +130,119 @@ export default async function SummaryPage({ searchParams }: { searchParams: Prom
   }
 
   return (
-    <div className="space-y-6 pb-24">
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="p-2 bg-white rounded-full border border-zinc-200 hover:bg-zinc-50 transition-colors">
-          <ChevronLeft className="w-6 h-6 text-zinc-600" />
+    <div className="space-y-5 pb-24 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <Link href="/dashboard" className="p-2 bg-white rounded-full border border-zinc-200 hover:bg-zinc-50 transition-colors shadow-sm">
+          <ChevronLeft className="w-5 h-5 text-zinc-600" />
         </Link>
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900">{dict.summary.title}</h1>
-          <p className="text-sm text-zinc-400">{dict.summary.subtitle} {periodLabel}</p>
+          <p className="text-sm text-zinc-400">{periodLabel}</p>
         </div>
       </div>
 
-      {/* Tabs และระบบเลือกวันที่แบบ Client Component */}
+      {/* Date Filter */}
       <DateFilterTabs dict={dict.summary} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-        {/* รายรับรวม */}
-        <div className="bg-white p-4 rounded-3xl shadow-sm border border-zinc-200 flex flex-col justify-between">
-          <div className="w-8 h-8 rounded-xl bg-zinc-900 text-white flex items-center justify-center mb-3 shadow-sm">
-            <TrendingUp className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">{dict.summary.total_revenue || 'ยอดรับรวม'}</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-zinc-900">฿{totalRevenue.toLocaleString()}</p>
-            <div className="flex gap-2 mt-2">
-              <span className="bg-emerald-50 text-emerald-700 text-[10px] px-2 py-0.5 rounded-full font-bold">{dict.summary.cash || 'สด'}: ฿{totalCash.toLocaleString()}</span>
-              <span className="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-full font-bold">{dict.summary.transfer || 'โอน'}: ฿{totalTransfer.toLocaleString()}</span>
+      {/* ─── Net Profit Hero ─── */}
+      <div className={`rounded-3xl p-6 sm:p-8 ${netProfit >= 0 ? 'bg-zinc-900' : 'bg-red-950'} shadow-xl relative overflow-hidden`}>
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+        <p className="text-zinc-500 text-xs font-semibold uppercase tracking-widest mb-2 relative z-10">
+          {dict.summary.net_profit || 'กำไรสุทธิ (หักทุกอย่าง)'}
+        </p>
+        <p className={`text-4xl sm:text-5xl font-extrabold tracking-tight relative z-10 ${netProfit >= 0 ? 'text-white' : 'text-red-300'}`}>
+          ฿{netProfit.toLocaleString()}
+        </p>
+        <p className="text-zinc-600 text-xs mt-2 relative z-10">{periodLabel}</p>
+      </div>
+
+      {/* ─── รายรับ ─── */}
+      <div>
+        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest px-1 mb-3">รายรับ</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="col-span-2 bg-white border border-zinc-200 rounded-3xl p-5 shadow-sm">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-xl bg-zinc-900 text-white flex items-center justify-center">
+                <TrendingUp className="w-4 h-4" />
+              </div>
+              <div className="flex gap-2 flex-wrap justify-end">
+                <span className="bg-emerald-50 text-emerald-700 text-[10px] px-2 py-1 rounded-full font-bold border border-emerald-100">{dict.summary.cash || 'สด'} ฿{totalCash.toLocaleString()}</span>
+                <span className="bg-blue-50 text-blue-600 text-[10px] px-2 py-1 rounded-full font-bold border border-blue-100">{dict.summary.transfer || 'โอน'} ฿{totalTransfer.toLocaleString()}</span>
+              </div>
             </div>
+            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-1">{dict.summary.total_revenue || 'ยอดรับรวม'}</p>
+            <p className="text-3xl font-extrabold text-zinc-900">฿{totalRevenue.toLocaleString()}</p>
           </div>
-        </div>
-        
-        {/* กำไรเบื้องต้น */}
-        <div className="bg-white p-4 rounded-3xl shadow-sm border border-zinc-200 flex flex-col justify-between">
-          <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-3 shadow-sm">
-            <PiggyBank className="w-4 h-4" />
+          <div className="bg-white border border-zinc-200 rounded-3xl p-4 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-600 flex items-center justify-center mb-3">
+              <PiggyBank className="w-4 h-4" />
+            </div>
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">{dict.summary.gross_profit || 'กำไรเบื้องต้น'}</p>
+            <p className="text-xl font-extrabold text-zinc-900">฿{grossProfit.toLocaleString()}</p>
           </div>
-          <div>
-            <p className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">{dict.summary.gross_profit || 'กำไรเบื้องต้น'}</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-zinc-900">฿{grossProfit.toLocaleString()}</p>
-          </div>
-        </div>
-
-        {/* กำไรสุทธิ */}
-        <div className="bg-emerald-50 p-4 rounded-3xl shadow-sm border border-emerald-200 flex flex-col justify-between sm:col-span-1 col-span-2">
-          <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center mb-3 shadow-sm">
-            <TrendingUp className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-[11px] sm:text-xs font-bold text-emerald-700 uppercase tracking-wider mb-0.5">{dict.summary.net_profit || 'กำไรสุทธิ (หักทุกอย่าง)'}</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-emerald-700">฿{netProfit.toLocaleString()}</p>
-          </div>
-        </div>
-
-        {/* ค่าแรงช่าง */}
-        <div className="bg-red-50 p-4 rounded-3xl shadow-sm border border-red-200 flex flex-col justify-between">
-          <div className="w-8 h-8 rounded-xl bg-red-600 text-white flex items-center justify-center mb-3 shadow-sm">
-            <Wallet className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-[11px] sm:text-xs font-bold text-red-700 uppercase tracking-wider mb-0.5">{dict.summary.total_wage || 'รายจ่ายค่าแรง'}</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-red-700">฿{totalWage.toLocaleString()}</p>
-          </div>
-        </div>
-
-        {/* ค่าใช้จ่ายอื่นๆ */}
-        <div className="bg-orange-50 p-4 rounded-3xl shadow-sm border border-orange-200 flex flex-col justify-between">
-          <div className="w-8 h-8 rounded-xl bg-orange-600 text-white flex items-center justify-center mb-3 shadow-sm">
-            <Receipt className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-[11px] sm:text-xs font-bold text-orange-700 uppercase tracking-wider mb-0.5">{dict.summary.total_expense || 'ค่าใช้จ่ายจิปาถะ'}</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-orange-700">฿{totalExpense.toLocaleString()}</p>
-          </div>
-        </div>
-
-        {/* จำนวนบิล */}
-        <div className="bg-white p-4 rounded-3xl shadow-sm border border-zinc-200 flex flex-col justify-between hidden sm:flex">
-          <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-400 flex items-center justify-center mb-3">
-            <Receipt className="w-4 h-4" />
-          </div>
-          <div>
-            <p className="text-[11px] sm:text-xs font-bold text-zinc-400 uppercase tracking-wider mb-0.5">{dict.summary.total_bills || 'จำนวนบิลทั้งหมด'}</p>
-            <p className="text-xl sm:text-2xl font-extrabold text-zinc-900">{totalBills} <span className="text-sm font-medium text-zinc-400">{dict.summary.items || 'รายการ'}</span></p>
+          <div className="bg-white border border-zinc-200 rounded-3xl p-4 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-zinc-100 text-zinc-500 flex items-center justify-center mb-3">
+              <Receipt className="w-4 h-4" />
+            </div>
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">{dict.summary.total_bills || 'จำนวนบิล'}</p>
+            <p className="text-xl font-extrabold text-zinc-900">{totalBills} <span className="text-sm font-medium text-zinc-400">{dict.summary.items || 'รายการ'}</span></p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-zinc-200 p-1 sm:p-2 mt-4">
-        <div className="px-4 py-4 border-b border-zinc-200 flex items-center gap-2">
-          <Wallet className="w-5 h-5 text-red-500" />
-          <h2 className="font-bold text-zinc-900">{dict.summary.wage_breakdown || 'แจกแจงรายจ่ายค่าแรง (ต้องจ่ายใคร เท่าไหร่)'}</h2>
+      {/* ─── รายจ่าย ─── */}
+      <div>
+        <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest px-1 mb-3">รายจ่าย</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-white border border-red-100 rounded-3xl p-4 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center mb-3">
+              <Wallet className="w-4 h-4" />
+            </div>
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">{dict.summary.total_wage || 'ค่าแรงช่าง'}</p>
+            <p className="text-xl font-extrabold text-red-600">฿{totalWage.toLocaleString()}</p>
+          </div>
+          <div className="bg-white border border-orange-100 rounded-3xl p-4 shadow-sm">
+            <div className="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mb-3">
+              <Receipt className="w-4 h-4" />
+            </div>
+            <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-1">{dict.summary.total_expense || 'ค่าใช้จ่ายอื่น'}</p>
+            <p className="text-xl font-extrabold text-orange-600">฿{totalExpense.toLocaleString()}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Wage Breakdown ─── */}
+      <div className="bg-white rounded-3xl shadow-sm border border-zinc-200 overflow-hidden">
+        <div className="px-5 py-4 border-b border-zinc-100 flex items-center gap-2">
+          <Users className="w-4 h-4 text-zinc-400" />
+          <h2 className="font-bold text-zinc-900 text-base">{dict.summary.wage_breakdown || 'แจกแจงค่าแรงช่าง'}</h2>
         </div>
         <div className="divide-y divide-zinc-50">
           {staffStats.length === 0 ? (
-            <p className="p-8 text-center text-zinc-400 text-sm">{dict.summary.no_data || 'ยังไม่มีข้อมูลช่างหรือรายการใน'} {periodLabel}</p>
+            <p className="p-8 text-center text-zinc-400 text-sm">{dict.summary.no_data || 'ยังไม่มีข้อมูลใน'} {periodLabel}</p>
           ) : (
             staffStats.map((stat, i) => (
-              <div key={i} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 hover:bg-zinc-50 transition-colors gap-3">
-                <div className="flex-1">
-                  <p className="font-bold text-zinc-900 text-base">{stat.name}</p>
-                  <p className="text-xs text-zinc-400 mt-1">{dict.summary.sales_generated || 'ทำยอดขายให้ร้าน:'} <span className="font-medium text-zinc-600">฿{stat.revenue.toLocaleString()}</span> ({stat.bills} {dict.summary.bills || 'บิล'})</p>
-                </div>
-                <div className="flex flex-col sm:items-end bg-red-950/5 p-3 sm:p-0 rounded-xl gap-2">
-                  <div className="sm:text-right">
-                    <p className="text-[11px] text-zinc-400 font-medium mb-0.5">{dict.summary.to_pay || 'ยอดที่ต้องจ่าย'} {stat.wageLabel}</p>
-                    <p className="font-extrabold text-red-700 text-lg">฿{stat.wage.toLocaleString()}</p>
+              <div key={i} className="p-4 sm:px-6 hover:bg-zinc-50/80 transition-colors">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <p className="font-bold text-zinc-900">{stat.name}</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">
+                      {dict.summary.sales_generated || 'ยอดขาย'}: <span className="font-semibold text-zinc-600">฿{stat.revenue.toLocaleString()}</span> ({stat.bills} {dict.summary.bills || 'บิล'})
+                    </p>
                   </div>
-                  <Link 
-                    href={`/dashboard/summary/slip?staff_id=${stat.id}&period=${period}&start=${start}&end=${end}`}
-                    className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-zinc-900 text-white rounded-lg text-xs font-bold hover:bg-zinc-800 transition-colors shadow-sm self-start sm:self-end"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    พิมพ์สลิปเงินเดือน
-                  </Link>
+                  <div className="text-right">
+                    <p className="text-[10px] text-zinc-400 mb-0.5">{stat.wageLabel}</p>
+                    <p className="font-extrabold text-red-600 text-lg">฿{stat.wage.toLocaleString()}</p>
+                  </div>
                 </div>
+                <Link
+                  href={`/dashboard/summary/slip?staff_id=${stat.id}&period=${period}&start=${start}&end=${end}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-colors shadow-sm"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  พิมพ์สลิปเงินเดือน
+                </Link>
               </div>
             ))
           )}
@@ -252,3 +251,5 @@ export default async function SummaryPage({ searchParams }: { searchParams: Prom
     </div>
   )
 }
+
+

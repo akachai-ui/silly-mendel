@@ -6,7 +6,8 @@ export default async function TaxReportPage({ searchParams }: { searchParams: Pr
   const { period = 'month', start = '', end = '' } = await searchParams;
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   if (!user) redirect('/login')
 
   const { data: shop } = await supabase.from('shops').select('id, name, address, tax_id').eq('owner_id', user.id).single()

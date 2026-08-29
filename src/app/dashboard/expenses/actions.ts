@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache'
 
 export async function addExpense(formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
 
   if (!user) return { error: 'Unauthorized' }
 
@@ -42,7 +43,8 @@ export async function addExpense(formData: FormData) {
 
 export async function deleteExpense(expenseId: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
 
   if (!user) return { error: 'Unauthorized' }
 
@@ -67,7 +69,8 @@ export async function deleteExpense(expenseId: string) {
 
 export async function updateExpense(expenseId: string, formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
 
   if (!user) return { error: 'Unauthorized' }
 

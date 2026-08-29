@@ -7,7 +7,8 @@ export default async function SlipPage({ searchParams }: { searchParams: Promise
   if (!staff_id) redirect('/dashboard/summary')
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   if (!user) redirect('/login')
 
   const { data: shop } = await supabase.from('shops').select('name, logo_url').eq('owner_id', user.id).single()

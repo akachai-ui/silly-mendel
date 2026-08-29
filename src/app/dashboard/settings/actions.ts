@@ -5,7 +5,8 @@ import { revalidatePath } from 'next/cache'
 
 export async function updateShopProfile(shopId: string, formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
 
   if (!user) {
     return { error: 'ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่' }
@@ -69,7 +70,8 @@ export async function updateShopProfile(shopId: string, formData: FormData) {
 
 export async function removeLogo(shopId: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
 
   if (!user) return { error: 'Unauthorized' }
 

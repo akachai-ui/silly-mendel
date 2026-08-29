@@ -14,7 +14,8 @@ export async function addStaff(formData: FormData) {
   if (!name || name.trim() === '') return { error: 'กรุณากรอกชื่อช่าง' }
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   if (!user) return { error: 'Unauthorized' }
   const { data: shop } = await supabase.from('shops').select('id').eq('owner_id', user.id).single()
 

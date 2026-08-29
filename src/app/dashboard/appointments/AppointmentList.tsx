@@ -154,13 +154,23 @@ export default function AppointmentList({ appointments, staffList, servicesList,
                   {/* สถานะ และ การเปลี่ยนสถานะ */}
                   <div className="pl-2 mt-4 pt-3 border-t border-zinc-100">
                     {apt.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleStatusChange(apt.id, 'completed')} disabled={loadingId === apt.id} className="flex-1 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors shadow-sm text-center">
-                          {dict?.completed || 'ทำเสร็จแล้ว'}
-                        </button>
-                        <button onClick={() => handleStatusChange(apt.id, 'cancelled')} disabled={loadingId === apt.id} className="flex-1 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-xs font-bold hover:bg-red-50 transition-colors shadow-sm text-center">
-                          {dict?.cancel_queue || 'ยกเลิก'}
-                        </button>
+                      <div className="space-y-2">
+                        {/* Auto Bill Button */}
+                        <a
+                          href={`/dashboard/transactions/new?staff_id=${apt.staff_id || ''}&service=${encodeURIComponent(apt.service_name || '')}&customer=${encodeURIComponent(apt.customer_name || '')}&apt_id=${apt.id}`}
+                          className="flex items-center justify-center gap-1.5 w-full py-2 bg-zinc-900 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-colors shadow-sm"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4"/></svg>
+                          เสร็จ → เปิดบิลรับเงิน
+                        </a>
+                        <div className="flex gap-2">
+                          <button onClick={() => handleStatusChange(apt.id, 'completed')} disabled={loadingId === apt.id} className="flex-1 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold hover:bg-emerald-100 transition-colors shadow-sm text-center">
+                            {dict?.completed || 'เสร็จ (ไม่เปิดบิล)'}
+                          </button>
+                          <button onClick={() => handleStatusChange(apt.id, 'cancelled')} disabled={loadingId === apt.id} className="flex-1 py-1.5 bg-white border border-red-200 text-red-600 rounded-lg text-xs font-bold hover:bg-red-50 transition-colors shadow-sm text-center">
+                            {dict?.cancel_queue || 'ยกเลิก'}
+                          </button>
+                        </div>
                       </div>
                     )}
                     {isCompleted && <span className="inline-flex px-2 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-bold items-center gap-1.5 w-full justify-center"><CheckCircle className="w-3.5 h-3.5"/> {dict?.completed || 'ลูกค้ามาใช้บริการแล้ว'}</span>}

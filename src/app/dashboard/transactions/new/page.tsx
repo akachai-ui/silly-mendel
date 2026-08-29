@@ -1,18 +1,24 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, AlertCircle } from 'lucide-react'
+import { ChevronLeft, AlertCircle, CalendarDays } from 'lucide-react'
 import TransactionForm from './TransactionForm'
 import { getDictionary } from '@/utils/i18n'
 
-export default async function NewTransactionPage() {
+export default async function NewTransactionPage({
+  searchParams
+}: {
+  searchParams: Promise<{ staff_id?: string; service?: string; customer?: string; apt_id?: string }>
+}) {
   const supabase = await createClient()
   
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
   const { data: shop } = await supabase.from('shops').select('id').eq('owner_id', user?.id).single()
   if (!shop) redirect('/onboarding')
 
   const dict = await getDictionary()
+  const params = await searchParams
 
   // ดึงข้อมูลพร้อมกัน (Parallel Fetching)
   const today = new Date().toISOString().split('T')[0]
@@ -27,11 +33,19 @@ export default async function NewTransactionPage() {
     supabase.from('appointments').select('id, customer_name, appointment_time, service_name, staff_id').eq('shop_id', shop.id).eq('status', 'pending').gte('appointment_date', today).order('appointment_date').order('appointment_time')
   ])
 
+  // ข้อมูล pre-fill จาก Appointment
+  const preselect = params.staff_id ? {
+    staffId: params.staff_id,
+    serviceName: params.service || '',
+    customerName: params.customer || '',
+    aptId: params.apt_id || ''
+  } : null
+
   return (
     <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-500 pb-32 sm:pb-0 px-4 sm:px-0">
       
       <div className="flex items-center space-x-3 pt-2">
-        <Link href="/dashboard" className="p-2 -ml-2 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-900 rounded-xl transition-colors">
+        <Link href="/dashboard/appointments" className="p-2 -ml-2 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-900 rounded-xl transition-colors">
           <ChevronLeft className="w-7 h-7" />
         </Link>
         <div>
@@ -39,6 +53,17 @@ export default async function NewTransactionPage() {
           <p className="text-sm text-zinc-400">{dict.transaction.subtitle}</p>
         </div>
       </div>
+
+      {/* Banner บอกว่ามาจากคิว */}
+      {preselect && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl px-4 py-3 flex items-center gap-3">
+          <CalendarDays className="w-5 h-5 text-indigo-600 shrink-0" />
+          <div>
+            <p className="text-sm font-bold text-indigo-900">เปิดบิลจากคิว: {preselect.customerName}</p>
+            <p className="text-xs text-indigo-600">ข้อมูลถูก pre-fill ให้แล้ว ตรวจสอบและยืนยันได้เลย</p>
+          </div>
+        </div>
+      )}
 
       {/* ถ้ายังไม่มีช่างในระบบ ให้บังคับไปเพิ่มช่างก่อน */}
       {!staffList || staffList.length === 0 ? (
@@ -56,9 +81,12 @@ export default async function NewTransactionPage() {
           servicesList={servicesList || []} 
           pendingAppointments={pendingAppointments || []}
           dict={dict.transaction}
+          preselect={preselect}
         />
       )}
 
     </div>
   )
 }
+
+
