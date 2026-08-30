@@ -6,6 +6,56 @@ import { Loader2, CheckCircle2, CalendarClock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import ConfirmModal from '@/components/ConfirmModal'
 
+function smartMatchServices(inputServiceStr: string, services: any[]): { matched: any[], total: number } {
+  if (!inputServiceStr || !services || services.length === 0) {
+    return { matched: [], total: 0 }
+  }
+
+  const raw = inputServiceStr.trim()
+  const lowerRaw = raw.toLowerCase()
+
+  // 1. Check if string has multiple services separated by +, /, comma, &
+  const parts = lowerRaw.split(/\s*(?:\+|\/|,|&|\s+และ\s+)\s*/).map(p => p.trim()).filter(Boolean)
+  const matched: any[] = []
+  const matchedIds = new Set<string>()
+
+  // Try matching each part
+  for (const part of parts) {
+    // Exact match
+    let found = services.find(s => !matchedIds.has(s.id) && s.name.trim().toLowerCase() === part)
+    // Fuzzy substring match
+    if (!found) {
+      found = services.find(s => !matchedIds.has(s.id) && (
+        s.name.trim().toLowerCase().includes(part) ||
+        part.includes(s.name.trim().toLowerCase())
+      ))
+    }
+    if (found) {
+      matched.push(found)
+      matchedIds.add(found.id)
+    }
+  }
+
+  // 2. If nothing matched yet, check all services against full string
+  if (matched.length === 0) {
+    for (const s of services) {
+      const sLower = s.name.trim().toLowerCase()
+      if (!matchedIds.has(s.id) && (lowerRaw.includes(sLower) || sLower.includes(lowerRaw))) {
+        matched.push(s)
+        matchedIds.add(s.id)
+      }
+    }
+  }
+
+  // 3. Fallback: if only 1 service exists in the shop, match it!
+  if (matched.length === 0 && services.length === 1) {
+    matched.push(services[0])
+  }
+
+  const total = matched.reduce((sum, s) => sum + Number(s.price || 0), 0)
+  return { matched, total }
+}
+
 export default function TransactionForm({ 
   staffList, 
   servicesList, 
@@ -20,16 +70,15 @@ export default function TransactionForm({
   preselect?: { staffId?: string; serviceName?: string; customerName?: string; aptId?: string } | null
 }) {
   // Pre-calculate initial amount if preselect service matches
-  const initialMatchedServices = preselect?.serviceName
-    ? servicesList.filter((s: any) => preselect.serviceName?.includes(s.name))
-    : []
-  const initialAmount = initialMatchedServices.reduce((sum: number, s: any) => sum + Number(s.price || 0), 0)
+  const initialMatch = preselect?.serviceName
+    ? smartMatchServices(preselect.serviceName, servicesList)
+    : { matched: [], total: 0 }
 
   const [isLoading, setIsLoading] = useState(false)
   const [selectedStaffId, setSelectedStaffId] = useState<string>(preselect?.staffId || '')
-  const [amount, setAmount] = useState<string>(initialAmount > 0 ? initialAmount.toString() : '')
-  const [serviceName, setServiceName] = useState<string>(preselect?.serviceName || '')
-  const [selectedServices, setSelectedServices] = useState<any[]>(initialMatchedServices)
+  const [amount, setAmount] = useState<string>(initialMatch.total > 0 ? initialMatch.total.toString() : '')
+  const [serviceName, setServiceName] = useState<string>(preselect?.serviceName || (initialMatch.matched.map(s => s.name).join(' + ')))
+  const [selectedServices, setSelectedServices] = useState<any[]>(initialMatch.matched)
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'transfer'>('cash')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(preselect?.aptId || null)
@@ -48,23 +97,11 @@ export default function TransactionForm({
       
       if (apt.service_name) {
         setServiceName(apt.service_name)
+        const { matched, total } = smartMatchServices(apt.service_name, servicesList)
         
-        // Auto-calculate price based on matched standard services
-        const serviceNames = apt.service_name.split(' + ')
-        let calculatedTotal = 0
-        let matchedServices: any[] = []
-        
-        serviceNames.forEach((name: string) => {
-          const found = servicesList.find((s: any) => s.name === name.trim())
-          if (found) {
-            calculatedTotal += Number(found.price || 0)
-            matchedServices.push(found)
-          }
-        })
-        
-        if (calculatedTotal > 0) {
-          setAmount(calculatedTotal.toString())
-          setSelectedServices(matchedServices)
+        if (total > 0) {
+          setAmount(total.toString())
+          setSelectedServices(matched)
         } else {
           setAmount('')
           setSelectedServices([])
@@ -77,6 +114,7 @@ export default function TransactionForm({
       if (apt.staff_id) setSelectedStaffId(apt.staff_id)
     }
   }
+
 
   const handlePreSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -193,8 +231,15 @@ export default function TransactionForm({
           <p className="text-zinc-400 font-medium mb-2">{dict.revenue_amount}</p>
           {serviceName && (
              <span className="inline-block bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold mb-4 animate-in fade-in zoom-in">
-               {serviceName}
+               ✂️ {serviceName}
              </span>
+          )}
+          {selectedAppointmentId && (!amount || Number(amount) <= 0) && (
+            <div className="mb-4">
+              <span className="inline-block bg-amber-50 text-amber-700 px-3 py-1.5 rounded-xl text-xs font-bold border border-amber-200 animate-in fade-in">
+                💡 แตะเลือกบริการด่วนด้านล่าง หรือพิมพ์ระบุราคา
+              </span>
+            </div>
           )}
           <div className="flex items-center justify-center">
             <span className="text-4xl text-zinc-600 font-bold mr-2 select-none">฿</span>
@@ -203,11 +248,7 @@ export default function TransactionForm({
               inputMode="numeric"
               pattern="[0-9]*"
               value={amount}
-              onChange={(e) => {
-                setAmount(e.target.value)
-                setServiceName('')
-                setSelectedServices([]) // เคลียร์เมนูด่วนถ้ามีการพิมพ์แก้เลขเอง
-              }}
+              onChange={(e) => setAmount(e.target.value)}
               placeholder="0"
               required
               min="1"

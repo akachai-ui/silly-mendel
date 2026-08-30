@@ -5,6 +5,12 @@ import { toast } from 'sonner'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+const QUICK_TIME_SLOTS = [
+  '09:00', '10:00', '10:30', '11:00', '11:30', '12:00',
+  '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+  '16:00', '16:30', '17:00', '17:30', '18:00', '19:00', '20:00'
+]
+
 export default function AppointmentForm({ staffList, servicesList, dict }: { staffList: any[], servicesList: any[], dict?: any }) {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -19,6 +25,10 @@ export default function AppointmentForm({ staffList, servicesList, dict }: { sta
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!appointmentTime) {
+      toast.error('กรุณาเลือกเวลานัดหมาย')
+      return
+    }
     setIsLoading(true)
     
     const formData = new FormData()
@@ -43,16 +53,55 @@ export default function AppointmentForm({ staffList, servicesList, dict }: { sta
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-3xl border border-zinc-200 shadow-sm space-y-6">
       
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-bold text-zinc-900 mb-2">{dict?.date || 'วันที่'} <span className="text-red-500">*</span></label>
-          <input type="date" required value={appointmentDate} onChange={e => setAppointmentDate(e.target.value)} className="text-zinc-900 w-full min-w-0 appearance-none px-3 py-3 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium" />
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-bold text-zinc-900 mb-2">{dict?.date || 'วันที่'} <span className="text-red-500">*</span></label>
+            <input 
+              type="date" 
+              required 
+              value={appointmentDate} 
+              onChange={e => setAppointmentDate(e.target.value)} 
+              className="text-zinc-900 w-full px-3 py-3 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium bg-white" 
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-bold text-zinc-900 mb-2">{dict?.time || 'เวลา'} <span className="text-red-500">*</span></label>
+            <input 
+              type="time" 
+              required 
+              value={appointmentTime} 
+              onChange={e => setAppointmentTime(e.target.value)} 
+              className="text-zinc-900 w-full px-3 py-3 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium bg-white" 
+            />
+          </div>
         </div>
+
+        {/* 📱 ปุ่มลัดเลือกเวลาด่วนสำหรับสมาร์ตโฟน */}
         <div>
-          <label className="block text-sm font-bold text-zinc-900 mb-2">{dict?.time || 'เวลา'} <span className="text-red-500">*</span></label>
-          <input type="time" required value={appointmentTime} onChange={e => setAppointmentTime(e.target.value)} className="text-zinc-900 w-full min-w-0 appearance-none px-3 py-3 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium" />
+          <p className="text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">แตะเลือกเวลาด่วน:</p>
+          <div className="flex gap-1.5 overflow-x-auto pb-1.5 hide-scrollbar">
+            {QUICK_TIME_SLOTS.map(slot => {
+              const isSelected = appointmentTime === slot
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  onClick={() => setAppointmentTime(slot)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all border ${
+                    isSelected
+                      ? 'bg-zinc-900 text-white border-zinc-900 shadow-sm scale-105'
+                      : 'bg-zinc-50 text-zinc-700 border-zinc-200 hover:bg-zinc-100 hover:border-zinc-300'
+                  }`}
+                >
+                  {slot} น.
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
+
 
       <div>
         <label className="block text-sm font-bold text-zinc-900 mb-2">{dict?.customer_name || 'ชื่อลูกค้า'} <span className="text-red-500">*</span></label>

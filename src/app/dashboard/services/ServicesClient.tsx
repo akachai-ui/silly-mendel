@@ -63,14 +63,18 @@ export default function ServicesClient({ initialServices, dict }: { initialServi
        {!isOpen ? (
          <button 
            onClick={handleOpenAdd} 
-           className="w-full py-6 border-2 border-dashed border-zinc-200 rounded-3xl text-zinc-400 font-bold hover:text-zinc-900 hover:bg-zinc-50 hover:border-zinc-400 transition-all flex items-center justify-center gap-3 shadow-sm active:scale-95"
+           className="w-full bg-white hover:bg-zinc-50 border-2 border-dashed border-zinc-300 hover:border-zinc-900 rounded-3xl py-4 sm:py-5 flex items-center justify-center text-zinc-900 font-extrabold transition-all shadow-sm active:scale-98 group"
          >
-            <div className="bg-zinc-100 p-2 rounded-full"><Plus className="w-5 h-5"/></div>
-            <span>{dict?.add_service || 'เพิ่มรายการบริการ / ราคามาตรฐาน'}</span>
+            <div className="flex items-center space-x-2.5">
+              <div className="bg-zinc-900 text-white p-2 rounded-xl group-hover:scale-110 transition-transform shadow-sm">
+                <Plus className="w-4 h-4" />
+              </div>
+              <span className="text-sm sm:text-base font-extrabold text-zinc-900">{dict?.add_service || '+ เพิ่มบริการใหม่ / กำหนดราคา'}</span>
+            </div>
          </button>
        ) : (
-         <form onSubmit={handleSave} className="bg-white p-6 rounded-3xl border border-zinc-200 shadow-sm animate-in zoom-in-95 duration-200">
-           <div className="flex justify-between items-center mb-5">
+         <form onSubmit={handleSave} className="bg-white p-6 rounded-3xl border border-zinc-200 shadow-lg animate-in zoom-in-95 duration-200">
+           <div className="flex justify-between items-center mb-5 pb-3 border-b border-zinc-100">
              <h2 className="text-lg font-bold text-zinc-900">{editingId ? (dict?.title ? `แก้ไข ${dict.title}` : 'แก้ไขบริการ') : (dict?.add_service || 'เพิ่มบริการใหม่')}</h2>
              <button type="button" onClick={() => setIsOpen(false)} className="p-2 hover:bg-zinc-100 text-zinc-400 hover:text-zinc-900 rounded-full transition-colors"><X className="w-5 h-5"/></button>
            </div>
@@ -81,7 +85,7 @@ export default function ServicesClient({ initialServices, dict }: { initialServi
                value={name} 
                onChange={e => setName(e.target.value)} 
                placeholder={dict?.service_name_ph || "ชื่อบริการ (เช่น ตัดผมชาย, สระซอย)"} 
-               className="text-zinc-900 flex-1 px-4 py-3 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900" 
+               className="text-zinc-900 flex-1 px-4 py-3 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium" 
              />
              <div className="relative sm:w-1/3">
                <input 
@@ -90,7 +94,7 @@ export default function ServicesClient({ initialServices, dict }: { initialServi
                  value={price} 
                  onChange={e => setPrice(e.target.value)} 
                  placeholder={dict?.price || "ราคา"} 
-                 className="text-zinc-900 w-full pl-8 pr-4 py-3 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900" 
+                 className="text-zinc-900 w-full pl-8 pr-4 py-3 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-bold" 
                />
                <span className="absolute right-4 top-3 text-zinc-400 font-medium">฿</span>
              </div>
@@ -127,8 +131,15 @@ export default function ServicesClient({ initialServices, dict }: { initialServi
                 </div>
              </div>
            )) : (
-             <div className="p-8 text-center text-zinc-400 text-sm">
-               {dict?.no_services_desc || 'ยังไม่มีการตั้งค่าบริการในระบบ'}
+             <div className="p-8 text-center text-zinc-400 text-sm space-y-3">
+               <p>{dict?.no_services || 'ยังไม่มีรายการบริการในร้าน'}</p>
+               <button
+                 onClick={handleOpenAdd}
+                 className="px-4 py-2 bg-zinc-900 text-white rounded-xl text-xs font-bold hover:bg-zinc-800 transition-colors shadow-sm inline-flex items-center gap-1.5"
+               >
+                 <Plus className="w-3.5 h-3.5" />
+                 {dict?.add_service || 'เพิ่มบริการแรกของคุณ'}
+               </button>
              </div>
            )}
          </div>

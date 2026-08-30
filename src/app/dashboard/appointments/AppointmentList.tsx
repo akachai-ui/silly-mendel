@@ -213,11 +213,11 @@ export default function AppointmentList({ appointments, staffList, servicesList,
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-zinc-900 mb-1.5">{dict?.date || 'วันที่'}</label>
-                  <input type="date" name="appointment_date" defaultValue={editingApt.appointment_date} required className="text-zinc-900 w-full min-w-0 appearance-none px-3 py-2.5 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium" />
+                  <input type="date" name="appointment_date" defaultValue={editingApt.appointment_date} required className="text-zinc-900 w-full min-w-0 px-3 py-2.5 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium bg-white" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-zinc-900 mb-1.5">{dict?.time || 'เวลา'}</label>
-                  <input type="time" name="appointment_time" defaultValue={editingApt.appointment_time} required className="text-zinc-900 w-full min-w-0 appearance-none px-3 py-2.5 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium" />
+                  <input type="time" name="appointment_time" defaultValue={editingApt.appointment_time} required className="text-zinc-900 w-full min-w-0 px-3 py-2.5 text-sm sm:text-base border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 font-medium bg-white" />
                 </div>
               </div>
 
