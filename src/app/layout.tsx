@@ -17,10 +17,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Lumina",
   description: "Salon Management SaaS",
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "Lumina",
+  },
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/apple-touch-icon.png",
   },
   formatDetection: {
     telephone: false, // Prevent Safari from auto-linking phone numbers unstyled
@@ -33,6 +38,7 @@ export const viewport = {
   maximumScale: 1,
   userScalable: false,
   viewportFit: 'cover', // Handles the iPhone notch
+  themeColor: '#18181b',
 };
 
 export default function RootLayout({
