@@ -79,6 +79,11 @@ export default async function DashboardLayout({
             <span className="hidden sm:inline">{dict.layout.home}</span>
           </Link>
           
+          <Link href="/dashboard/services" className="flex items-center gap-1.5 p-2 sm:px-4 text-sm font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors ml-1" title={dict.layout?.services || 'บริการ & ราคา'}>
+            <Scissors className="w-4 h-4" />
+            <span className="hidden sm:inline">{dict.layout?.services || 'บริการ'}</span>
+          </Link>
+
           <Link href="/dashboard/settings" className="flex items-center gap-1.5 p-2 sm:px-4 text-sm font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-full transition-colors ml-1" title={dict.layout.settings}>
             <Settings className="w-4 h-4" />
             <span className="hidden sm:inline">{dict.layout.settings}</span>
