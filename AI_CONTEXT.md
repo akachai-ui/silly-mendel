@@ -50,12 +50,20 @@ The database uses Supabase PostgreSQL with Row Level Security (RLS) enabled.
 - **Standalone PWA & Safari:** `viewport-fit=cover`, `appleWebApp: { capable: true }`, and `user-scalable=no` are enabled in `layout.tsx` to ensure it looks like a native iOS app.
 - **Printable Documents (Payslips):** Instead of refactoring nested Next.js layouts, printable pages (like `/dashboard/summary/slip`) use an injected `<style>` tag to set `header, nav { display: none !important; }` globally on that page. It uses an explicit `<a href="/dashboard/summary">` for the Back button to force a full reload and clear the CSS.
 
-### 5. Multi-language (i18n)
-- Language preference is stored in the `lumina_lang` cookie ('th' or 'en'). 
-- Dictionaries are loaded server-side via `src/utils/i18n.ts`.
+### 6. Super Admin & Dev Overview Portal (/admin)
+- Configured in `src/utils/admin.ts` using `isAdminEmail(user.email)` against `akachaiha@gmail.com` and `process.env.ADMIN_EMAILS`.
+- Dual-role switch button `[ 🛡️ Dev Admin ]` in `dashboard/layout.tsx`.
+- Admin page aggregates all shops, calculates GMV, counts active shops, and provides 1-click `+ 30 วัน PRO` buttons and slip approval.
+
+### 7. Smart POS Pricing & Auto-Bill (smartMatchServices)
+- Appointments feature a `เสร็จ → เปิดบิลรับเงิน` button passing query params.
+- `TransactionForm.tsx` uses `smartMatchServices()` to parse multi-service strings (e.g. "ตัดผม + สระไดร์"), performing fuzzy matching against `services` and summing their prices automatically.
+- Once the bill is submitted, the source appointment is marked `status = 'completed'` automatically.
 
 ## 🔮 Next Roadmap / Pending Features
 - **Customer Booking Link (ระบบจองคิวออนไลน์สำหรับลูกค้า):** A public-facing page where customers can select a service, a staff member, and a time slot, which feeds directly into the `appointments` table.
+- **Customer CRM / History:** View past visits, preferred stylists, and spending per customer.
 
 ---
 *Generated for AI Context Persistence. Read this file before initiating new development cycles.*
+
